@@ -44,7 +44,20 @@ public class Soccer5Server extends AbstractIdleService {
     }
 
     public static void main(String[] args) throws IOException {
-        int port = Integer.valueOf(firstNonNull(System.getProperty("app.port"), DEFAULT_PORT));
-        new Soccer5Server(port).startAndWait();
+        String port = getEnvPort();
+        new Soccer5Server(Integer.valueOf(port)).startAndWait();
+    }
+
+    private static String getEnvPort() {
+        String herokuPort = System.getenv("PORT");
+        String cloudBeesPort = System.getProperty("app.port");
+        String port = DEFAULT_PORT;
+        if (herokuPort!= null) {
+            port = herokuPort;
+        }
+        if (cloudBeesPort != null) {
+            port = cloudBeesPort;
+        }
+        return port;
     }
 }
