@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import javax.ws.rs.core.Response;
 
+import static com.github.kevinsawicki.http.HttpRequest.*;
 import static org.fest.assertions.Assertions.assertThat;
 
 /**
@@ -26,12 +27,17 @@ public class Soccer5ServerTest {
 
     @Test
     public void should_get_home() {
-        assertThat(HttpRequest.get("http://localhost:" + PORT).code()).isEqualTo(Response.Status.OK.getStatusCode());
+        assertThat(get("http://localhost:" + PORT).code()).isEqualTo(Response.Status.OK.getStatusCode());
     }
 
     @Test
     public void should_get_port() {
          assertThat(server.getPort()).isEqualTo(PORT);
+    }
+
+    @Test
+    public void should_manage_cors() {
+        assertThat(get("http://localhost:" + PORT).header("Access-Control-Allow-Origin")).isEqualTo("*");
     }
 
     @AfterClass

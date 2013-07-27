@@ -4,11 +4,13 @@ import com.google.common.util.concurrent.AbstractIdleService;
 import com.sun.jersey.api.container.httpserver.HttpServerFactory;
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.spi.container.ContainerRequest;
+import com.sun.jersey.spi.container.ContainerResponse;
+import com.sun.jersey.spi.container.ContainerResponseFilter;
 import com.sun.net.httpserver.HttpServer;
 
 import java.io.IOException;
 
-import static com.google.common.base.Objects.firstNonNull;
 import static net.binout.soccer5.Soccer5Application.ROOT_PATH;
 
 /**
@@ -26,6 +28,7 @@ public class Soccer5Server extends AbstractIdleService {
 
         Soccer5Application application = new Soccer5Application();
         ResourceConfig config = new DefaultResourceConfig(application.getClasses());
+        config.getContainerResponseFilters().add(new CORSFilter());
         httpServer = HttpServerFactory.create("http://localhost:" + port + ROOT_PATH, config, null);
     }
 
@@ -61,3 +64,11 @@ public class Soccer5Server extends AbstractIdleService {
         return port;
     }
 }
+class CORSFilter implements ContainerResponseFilter {
+    @Override
+    public ContainerResponse filter(ContainerRequest request, ContainerResponse response) {
+        response.getHttpHeaders().add("Access-Control-Allow-Origin", "*");
+        return response;
+    }
+}
+
