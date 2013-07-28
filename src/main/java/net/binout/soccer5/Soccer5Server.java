@@ -1,5 +1,6 @@
 package net.binout.soccer5;
 
+import com.google.common.base.Optional;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.sun.jersey.api.container.httpserver.HttpServerFactory;
 import com.sun.jersey.api.core.DefaultResourceConfig;
@@ -11,15 +12,13 @@ import com.sun.net.httpserver.HttpServer;
 
 import java.io.IOException;
 
-import static net.binout.soccer5.Soccer5Application.ROOT_PATH;
-
 /**
  * User: binout
  * Date: 26/07/13
  */
 public class Soccer5Server extends AbstractIdleService {
 
-    private static final String DEFAULT_PORT = "8080";
+    static final String DEFAULT_PORT = "8080";
     private int port;
     private HttpServer httpServer;
 
@@ -29,7 +28,7 @@ public class Soccer5Server extends AbstractIdleService {
         Soccer5Application application = new Soccer5Application();
         ResourceConfig config = new DefaultResourceConfig(application.getClasses());
         config.getContainerResponseFilters().add(new CORSFilter());
-        httpServer = HttpServerFactory.create("http://localhost:" + port + ROOT_PATH, config, null);
+        httpServer = HttpServerFactory.create("http://localhost:" + port + Soccer5Application.ROOT_PATH, config);
     }
 
     public int getPort() {
@@ -51,17 +50,10 @@ public class Soccer5Server extends AbstractIdleService {
         new Soccer5Server(Integer.valueOf(port)).startAndWait();
     }
 
-    private static String getEnvPort() {
-        String herokuPort = System.getenv("PORT");
-        String cloudBeesPort = System.getProperty("app.port");
-        String port = DEFAULT_PORT;
-        if (herokuPort!= null) {
-            port = herokuPort;
-        }
-        if (cloudBeesPort != null) {
-            port = cloudBeesPort;
-        }
-        return port;
+    static String getEnvPort() {
+        Optional<String> heroku = Optional.fromNullable(System.getenv("PORT"));
+        Optional<String> cloudbees = Optional.fromNullable(System.getProperty("app.port"));
+        return  heroku.or(cloudbees).or(DEFAULT_PORT);
     }
 }
 class CORSFilter implements ContainerResponseFilter {

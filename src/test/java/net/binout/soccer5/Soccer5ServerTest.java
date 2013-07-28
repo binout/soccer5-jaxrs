@@ -36,6 +36,11 @@ public class Soccer5ServerTest {
     }
 
     @Test
+    public void should_get_default_port() {
+        assertThat(Soccer5Server.getEnvPort()).isEqualTo(Soccer5Server.DEFAULT_PORT);
+    }
+
+    @Test
     public void should_manage_cors() {
         assertThat(get("http://localhost:" + PORT).header("Access-Control-Allow-Origin")).isEqualTo("*");
     }
